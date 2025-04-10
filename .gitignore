@@ -1,0 +1,39 @@
+# Bytecode and cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+env/
+*.env
+
+# VS Code settings
+.vscode/
+
+# OS trash
+.DS_Store
+Thumbs.db
+
+# Log and debug
+*.log
+
+# Snapshots
+snapshots/old_snapshots/
+snapshots_archive/
+
+# Obsidian artifacts (if present)
+.obsidian/
+*.canvas
+
+# Art & Branding stuff
+Art_Branding
+
+
+# Misc
+*.bak
+*.tmp
+*.swp
+
+# DO NOT DO THIS:
+# VirtualDesktopAccessor/

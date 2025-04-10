@@ -1,0 +1,26 @@
+{
+  "workspace": "Test#4",
+  "collection_id": "Apr0225_1851",
+  "captured_at": "2025-04-02T18:51:38.749526",
+  "desktops": {
+    "1": "Personal & Comms",
+    "2": "Code",
+    "3": "AI Stuff",
+    "4": "AI Apps",
+    "5": "Obsidian",
+    "6": "YT Channel",
+    "7": "Channel Tools",
+    "8": "Bus / Plng / Trng",
+    "9": "Clear Trend",
+    "10": "Monitoring"
+  },
+  "windows": [
+    {
+      "hwnd": 727146,
+      "title": "Voice access",
+      "exe": "VoiceAccess.exe",
+      "x": 0,
+      "y": 0,
+      "width": 2560,
+      "height": 40,
+      "desktop_id": 
