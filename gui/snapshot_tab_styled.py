@@ -1,4 +1,3 @@
-#gui/snapshot_tab.py
 
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -16,95 +15,39 @@ class SnapshotTab(ttk.Frame):
         self.snapshot_dir = Path("storage/snapshots")
         self.snapshot_dir.mkdir(parents=True, exist_ok=True)
         self.meta_labels = {}
-        self.snapshot_var = tk.StringVar(master=self)
-        self.restore_var = tk.StringVar(master=self)
+        self.snapshot_var = tk.StringVar()
+        self.restore_var = tk.StringVar()
         self._build_ui()
 
     def _build_ui(self):
-        header = ttk.Label(self, text="Snapshot Collection Management", font=("Segoe UI", 12, "bold"))
-        header.pack(pady=(10, 0))
+        header = ttk.Label(self, text="Snapshot Collection Management", style="Header.TLabel")
+        header.pack(pady=(8, 0))
 
         self.adv_check = ttk.Checkbutton(self, text="Advanced Mode", variable=self.advanced_mode)
         self.adv_check.pack(anchor="ne", padx=20, pady=(5, 0))
         ToolTip(self.adv_check, "Show debug output and snapshot metadata.")
 
-        # --- Create Collection Section ---
-        save_frame = ttk.LabelFrame(self, text="  Create Snapshot Collection  ", style="Bold.TLabelframe")
-        save_frame.pack(fill="x", padx=20, pady=(10,7))
+        save_frame = ttk.LabelFrame(self, text="Save Snapshot Collection", style="Bold.TLabelframe")
+        save_frame.pack(fill="x", padx=20, pady=(10, 5))
 
-        save_row = ttk.Frame(save_frame)
-        save_row.pack(fill="x",padx=(10,10), pady=(5, 5))
+        ttk.Label(save_frame, text="Collection Name:").pack(anchor="w", padx=10, pady=(5, 0))
+        self.snapshot_entry = ttk.Entry(save_frame, textvariable=self.snapshot_var, width=40)
+        self.snapshot_entry.pack(padx=10, pady=5)
 
-        ttk.Label(save_row, text="Collection Name:",style="Header.TLabel").pack(side="left",padx=(12,14))
-        self.snapshot_entry = ttk.Combobox(save_row, textvariable=self.snapshot_var, width=30)
-        self.snapshot_entry.pack(side="left", padx=(0, 12))
+        save_btn = ttk.Button(save_frame, text="📸 Create Collection", command=self._handle_capture)
+        save_btn.pack(pady=(0, 10))
+        ToolTip(save_btn, "Save a snapshot of all current Chrome windows.")
 
-        ToolTip(self.snapshot_entry, "Enter a name to identify this workspace layout.")
+        restore_frame = ttk.LabelFrame(self, text="Restore Snapshot Collection", style="Bold.TLabelframe")
+        restore_frame.pack(fill="x", padx=20, pady=(5, 10))
 
-        self.save_btn = ttk.Button(save_row, text="📸 Create Collection ", command=self._handle_capture)
-        self.save_btn.pack(side="left",padx=(0, 5))
-        ttk.Label(save_frame, text="[ Default Name : SS.DD-MMM-YY_HHMM ]", font=("Segoe UI", 8)).pack(anchor="w", padx=(125, 10), pady=(2, 10))
+        ttk.Label(restore_frame, text="Collection Name:").pack(anchor="w", padx=10, pady=(5, 0))
+        self.restore_dropdown = ttk.Combobox(restore_frame, textvariable=self.restore_var, values=self._get_collections(), width=38)
+        self.restore_dropdown.pack(padx=10, pady=5)
 
-        ToolTip(self.save_btn, "Save a snapshot of all current windows")
-        ToolTip(self.snapshot_entry, "Enter name to identify this snapshot collection")
-
-        check_row = ttk.Frame(save_frame)
-        check_row.pack(fill="x", padx=(25, 5), pady=(0, 10))
-
-        self.chrome_only = tk.BooleanVar(master=self)
-        self.app_only = tk.BooleanVar(master=self)
-
-        check_row = ttk.Frame(save_frame)
-        check_row.pack(fill="x", padx=(24, 5), pady=(0, 10))
-
-        chrome_check = ttk.Checkbutton(
-        check_row,
-        text="Capture Chrome Windows ONLY",
-        variable=self.chrome_only
-        )
-        chrome_check.pack(side="left", padx=(0, 10))
-
-        app_check = ttk.Checkbutton(
-        check_row,
-        text="Capture Apps ONLY",
-        variable=self.app_only
-        )
-        app_check.pack(side="left")
-
-        ToolTip(chrome_check, "Only include Chrome windows in the snapshot")
-        ToolTip(app_check, "Only include non-Chrome application windows in the snapshot")
-
-        # ------     Activity Divider     ------
-
-        ttk.Separator(self, orient="horizontal").pack(fill="x", padx=20, pady=10)
-
-        # --- Restore Collection Section ---
-        restore_frame = ttk.LabelFrame(self, text="  Restore Snapshot Collection", style="Bold.TLabelframe")
-        restore_frame.pack(fill="x", padx=20, pady=(0, 10))
-
-        restore_row = ttk.Frame(restore_frame)
-        restore_row.pack(fill="x", padx=10, pady=(5, 7))
-
-        ttk.Label(restore_row, text="Collection Name:", style="Header.TLabel").pack(side="left", padx=(12, 15))
-
-        self.restore_dropdown = ttk.Combobox(
-            restore_row,
-            textvariable=self.restore_var,
-            values=self._get_collections(),
-            width=30
-        )
-        self.restore_dropdown.pack(side="left", padx=(0,10))
-
-        restore_btn = ttk.Button(restore_row, text="🧩 Restore Collection ", command=self._handle_restore)
-        restore_btn.pack(side="left")
-
-        # NEW: Add hint text beneath the row
-        ttk.Label(restore_frame, text="[ Select a Snapshot Collection ]", font=("Segoe UI", 8)).pack(
-            anchor="w", padx=(153, 5), pady=(0, 10)
-        )
-
-        ToolTip(restore_btn, "Restore windows from the selected snapshot collection")
-
+        restore_btn = ttk.Button(restore_frame, text="🧩 Restore Collection", command=self._handle_restore)
+        restore_btn.pack(pady=(0, 10))
+        ToolTip(restore_btn, "Restore windows from the selected snapshot collection.")
 
         self.meta_frame = ttk.LabelFrame(self, text="Snapshot Metadata", style="Bold.TLabelframe")
         self.meta_frame.pack(fill="x", padx=20, pady=(0, 10))
@@ -126,7 +69,7 @@ class SnapshotTab(ttk.Frame):
     def _handle_capture(self):
         name = self.snapshot_var.get().strip()
         if not name:
-            messagebox.showwarning("Missing Name", "Please enter a name for the snapshot collection")
+            messagebox.showwarning("Missing Name", "Please enter a name for the snapshot collection.")
             return
 
         existing = self._get_collections()
@@ -146,17 +89,17 @@ class SnapshotTab(ttk.Frame):
     def _handle_restore(self):
         name = self.restore_var.get().strip()
         if not name:
-            messagebox.showwarning("No Selection", "Please select a collection to restore")
+            messagebox.showwarning("No Selection", "Please select a collection to restore.")
             return
 
         snap_dir = self.snapshot_dir / name
         if not snap_dir.exists():
-            messagebox.showerror("Not Found", f"Snapshot folder '{name}' not found")
+            messagebox.showerror("Not Found", f"Snapshot folder '{name}' not found.")
             return
 
         snapshots = sorted(snap_dir.glob("snapshot_*.json"), reverse=True)
         if not snapshots:
-            messagebox.showwarning("No Snapshots", f"No snapshots found in '{name}'")
+            messagebox.showwarning("No Snapshots", f"No snapshots found in '{name}'.")
             return
 
         snapshot_path = snapshots[0]

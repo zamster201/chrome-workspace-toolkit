@@ -1,3 +1,4 @@
+
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import os
@@ -13,31 +14,31 @@ class ShortcutTab(ttk.Frame):
         self.chrome_path = self._detect_chrome()
         self.profile_root = os.path.expandvars(r"%LOCALAPPDATA%\Google\Chrome\User Data")
         self.profiles = self._get_profiles()
-        self.target_dir = tk.StringVar(master=self,value=os.path.join(os.environ["USERPROFILE"], "Desktop"))
+        self.target_dir = tk.StringVar(value=os.path.join(os.environ["USERPROFILE"], "Desktop"))
         self._build_ui()
 
     def _build_ui(self):
         header = ttk.Label(self, text="Create Shortcuts from these Profiles", font=("Segoe UI", 12, "bold"))
-        header.pack(pady=(20, 0))
+        header.pack(pady=(8, 0))
 
         self.adv_check = ttk.Checkbutton(self, text="Advanced Mode", variable=self.advanced_mode)
-        self.adv_check.pack(anchor="ne", padx=20, pady=(15, 0))
+        self.adv_check.pack(anchor="ne", padx=20, pady=(5, 0))
         ToolTip(self.adv_check, "Enable internal logging and diagnostic output.")
 
         list_row = ttk.Frame(self)
-        list_row.pack(padx=15, pady=10, fill="x")
+        list_row.pack(padx=30, pady=10, fill="x")
 
         self.listbox = tk.Listbox(list_row, selectmode=tk.EXTENDED, width=40, height=10)
         self.listbox.pack()
         ToolTip(self.listbox, "Ctrl or Shift to select multiple profiles.")
 
         folder_row = ttk.Frame(self)
-        folder_row.pack(fill="x", padx=30, pady=(25, 0))
+        folder_row.pack(fill="x", padx=30, pady=(10, 0))
 
         ttk.Label(folder_row, text="Shortcut Target Folder:").pack(side="left")
 
         folder_entry = ttk.Entry(folder_row, textvariable=self.target_dir, width=40)
-        folder_entry.pack(side="left", padx=40)
+        folder_entry.pack(side="left", padx=5)
         ToolTip(folder_entry, "Folder where .lnk files will be created.")
 
         browse_btn = ttk.Button(folder_row, text="Browse", command=self._browse_folder)
@@ -45,7 +46,7 @@ class ShortcutTab(ttk.Frame):
         ToolTip(browse_btn, "Select a different folder for shortcut output.")
 
         gen_btn = ttk.Button(self, text="🚀 Generate Shortcuts", command=self._generate_shortcuts)
-        gen_btn.pack(pady=30)
+        gen_btn.pack(pady=15)
         ToolTip(gen_btn, "Create .lnk files for selected Chrome profiles in the target folder.")
 
         self.status_label = ttk.Label(self, text="", foreground="gray")

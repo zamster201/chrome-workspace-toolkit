@@ -37,3 +37,25 @@ Art_Branding
 
 # DO NOT DO THIS:
 # VirtualDesktopAccessor/
+
+# === CWT Clean-up Rules ===
+
+# Backup and debug variants
+*_BU.py
+*_backup.py
+*_rebuild.py
+*_synced.py
+*_diagnostic*.py
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+.venv/
+
+# VSCode settings
+.vscode/
+
+# External scratch dirs
+deepseek-ai-web-crawler-main/

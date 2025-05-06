@@ -45,7 +45,9 @@ class ToolTip:
             self.tip_window = None
 
 class ShortcutTab:
-    def __init__(self, master):
+    def __init__(self, master,advanced_mode):
+        super().__init__(master)
+        self.advanced_mode = advanced_mode
         self.frame = tk.Frame(master)
         self.chrome_path = self._detect_chrome()
         self.profile_root = os.path.expandvars(r"%LOCALAPPDATA%\Google\Chrome\User Data")

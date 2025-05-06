@@ -30,8 +30,8 @@ class ToolTip:
             tw.wm_overrideredirect(True)
             tw.geometry(f"+{x}+{y}")
             label = tk.Label(tw, text=self.text, justify=tk.LEFT,
-                             background="#ffffe0", relief=tk.SOLID, borderwidth=1,
-                             font=("tahoma", "8", "normal"))
+                            background="#ffffe0", relief=tk.SOLID, borderwidth=1,
+                            font=("tahoma", "8", "normal"))
             label.pack(ipadx=5, ipady=2)
         except:
             pass
@@ -41,13 +41,18 @@ class ToolTip:
             self.tip_window.destroy()
             self.tip_window = None
 
-class UtilitiesTab:
-    def __init__(self, master):
+class UtilitiesTab(ttk.Frame):
+    def __init__(self, master, advanced_mode):
+        self.advanced_mode = advanced_mode
+        super().__init__(master)
         self.frame = tk.Frame(master)
         self._build_ui()
 
     def _build_ui(self):
         ttk.Label(self.frame, text="🧰 Shell Folder Audit & Remap", font=("Arial", 14)).pack(pady=(20, 10))
+
+        self.adv_check = ttk.Checkbutton(self.frame, text="Advanced Mode", variable=self.advanced_mode)
+        self.adv_check.pack(anchor="w", padx=10)
 
         self.folder_tree = ttk.Treeview(self.frame, columns=("Status", "Path"), show="headings", height=8)
         self.folder_tree.heading("Status", text="Status")
@@ -101,6 +106,9 @@ class UtilitiesTab:
                 path = ""
                 status = "UNKNOWN"
 
+            if self.advanced_mode.get():
+                print(f"[DEBUG] {display_name}: {status} → {path}")
+
             self.folder_tree.insert("", "end", values=(display_name, status, path))
 
     def restore_shell_defaults(self):
@@ -126,6 +134,8 @@ class UtilitiesTab:
                 os.makedirs(target, exist_ok=True)
                 try:
                     winreg.SetValueEx(key, reg_name, 0, winreg.REG_EXPAND_SZ, target)
+                    if self.advanced_mode.get():
+                        print(f"[DEBUG] Restored {reg_name} → {target}")
                 except Exception as e:
                     print(f"[!] Failed to set {reg_name}: {e}")
 

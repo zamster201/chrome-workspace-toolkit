@@ -25,13 +25,14 @@ class MainWindow:
     def __init__(self, root):
         self.root = root
         root.title("Chrome Workspace Toolkit")
-       # Center the window on the screen
-        width, height = 600, 500
+       # Center the window on the screen - currently set for debug
+        width, height = 600, 650
         screen_width = root.winfo_screenwidth()
         screen_height = root.winfo_screenheight()
         x = (screen_width // 2) - (width // 2)
         y = (screen_height // 2) - (height // 2)
         root.geometry(f"{width}x{height}+{x}+{y}")
+        #root.geometry("600+500+600+300")
         root.resizable(False, False)
 
         # Container frame for notebook + footer

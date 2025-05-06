@@ -12,13 +12,16 @@ Last Updated: 2025-03-31
 """
 
 import tkinter as tk
+from tkinter import ttk
 import subprocess
 import os
 from pathlib import Path
 import json
 
-class ProfileTab:
-    def __init__(self, master):
+class ProfileTab(ttk.Frame):
+    def __init__(self, master, advanced_mode):
+        self.advanced_mode = advanced_mode
+        super().__init__(master)
         self.frame = tk.Frame(master)
         self.chrome_path = self._detect_chrome()
         self.profiles = self._get_profiles()

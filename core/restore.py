@@ -5,6 +5,7 @@ import traceback
 import win32gui
 import win32con
 from fuzzywuzzy import fuzz
+from pathlib import Path
 from pyvda import AppView, get_virtual_desktops
 from utils.get_all_visible_windows import get_all_visible_windows
 from utils.vda_utils import get_current_virtual_desktop_id
@@ -13,6 +14,17 @@ from utils.vda_utils import get_current_virtual_desktop_id
 IGNORED_PROCESSES = {"VoiceAccess.exe", "explorer.exe"}
 
 def move_and_resize(hwnd, x, y, width, height, logger=print):
+    """
+    Restores and repositions a window to the specified coordinates and size.
+
+    Args:
+        hwnd (int): Window handle.
+        x (int): X coordinate of the upper-left corner.
+        y (int): Y coordinate of the upper-left corner.
+        width (int): Desired window width.
+        height (int): Desired window height.
+        logger (Callable): Logging function for status output.
+    """
     try:
         win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
         win32gui.MoveWindow(hwnd, x, y, width, height, True)
@@ -26,6 +38,17 @@ def load_snapshot(snapshot_path):
         return json.load(f)
 
 def match_windows(snapshot, current_windows, threshold):
+    """
+    Performs fuzzy matching between saved snapshot windows and currently visible windows.
+
+    Args:
+        snapshot (dict): Snapshot data containing saved window entries.
+        current_windows (list): List of currently visible windows.
+        threshold (int): Matching score threshold to consider a window a valid match.
+
+    Returns:
+        list: Tuples of (snapshot_window, matched_live_window, match_score)
+    """
     matches = []
     for snap_win in snapshot["windows"]:
         best_match = None
@@ -72,6 +95,17 @@ def restore_window_layout(matches, threshold, logger):
             logger(f"[!] No match: {snap_win['title']} (best: {score})")
 
 def restore_windows(snapshot_path, threshold=85, return_to_origin=True, logger=print):
+    """
+    Restores a captured workspace snapshot by matching saved windows to current ones,
+    moving them to their original positions, and optionally reassigning them to their
+    original virtual desktops. Also returns to the starting desktop if requested.
+
+    Args:
+        snapshot_path (str): Path to the snapshot JSON file.
+        threshold (int): Fuzzy match threshold for window comparison (0–100).
+        return_to_origin (bool): Whether to return to the original desktop after restore.
+        logger (Callable): Logging function for status messages.
+    """
     snapshot = load_snapshot(snapshot_path)
     current_windows = get_all_visible_windows()
     start_desktop = get_current_virtual_desktop_id()
