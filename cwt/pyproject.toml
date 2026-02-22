@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "cwt"
+version = "0.1.0"
+description = "Chrome Workspace Toolkit – part of the Cognition Tool Set"
+authors = ["Tom"]
+packages = [{ include = "cwt" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pywin32 = "^306"
+pillow = "^10.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
