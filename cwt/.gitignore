@@ -22,6 +22,10 @@ Thumbs.db
 snapshots/old_snapshots/
 snapshots_archive/
 
+# Workspaces
+storage/workspaces/*.json
+cwt/data/*.sqlite
+
 # Obsidian artifacts (if present)
 .obsidian/
 *.canvas
