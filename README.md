@@ -14,26 +14,22 @@
 ## 🚀 Getting Started
 
 1. Clone the repo:
-   ```bash
+
    git clone https://github.com/zamster201/chrome-workspace-toolkit.git
+   
+   
 Install dependencies:
 
-bash
-Copy
-Edit
 pip install -r requirements.txt
+
 Run the app:
 
-bash
-Copy
-Edit
 python main.py
-Note: CWT requires pyvda and VirtualDesktopAccessor for managing Windows virtual desktops.
+
+NOTE: CWT requires pyvda and VirtualDesktopAccessor (included) for Windows virtual desktop(s) management (No additional setup is required)
 
 📁 Folder Structure
-graphql
-Copy
-Edit
+
 CWT/
 ├── core/               # Snapshot and restore logic
 ├── gui/                # All Tkinter GUI tabs
@@ -41,6 +37,7 @@ CWT/
 ├── utils/              # Low-level helpers (logging, desktop, path audit)
 ├── scripts/            # Optional CLI or test scripts
 └── main.py             # App entry point
+
 💡 Why CWT?
 Modern workflows are multi-window, multi-profile, and multi-context. CWT captures your entire working environment—so you can reset, restore, or rapidly pivot across tasks without wasting time.
 
@@ -51,14 +48,15 @@ Python 3.10+
 
 Admin rights (for full restore support)
 
-🛠️ Roadmap
- Multi-browser support (Brave, Edge)
+🛠️ Roadmap 
 
- Profile template generator
+ - Multi-browser support (Brave, Edge, Firefox)
 
- Workspace autosave & versioning
+ - Profile template generator
 
- PowerShell automation layer## Virtual Desktop Integration
+ - Workspace autosave & versioning
+
+ - PowerShell automation layer## Virtual Desktop Integration
 
 This toolkit relies on [VirtualDesktopAccessor](https://github.com/Ciantic/VirtualDesktopAccessor) via the `pyvda` Python wrapper. A preconfigured copy is included directly in this repo to ensure reliable cross-desktop functionality out of the box.
 
