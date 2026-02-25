@@ -41,19 +41,14 @@ class MainWindow:
         self.notebook.pack(fill="both", expand=True)
 
         self.workspace_tab = WorkspaceTab(self.notebook, advanced_mode=self.advanced_mode)
-        self.shortcut_tab = ShortcutTab(self.notebook, advanced_mode=self.advanced_mode)
-        self.snapshot_tab = SnapshotTab(self.notebook, advanced_mode=self.advanced_mode)
-        self.profile_tab = ProfileTab(self.notebook, advanced_mode=self.advanced_mode)
-        self.utilities_tab = UtilitiesTab(self.notebook, advanced_mode=self.advanced_mode)
-        workspace_tab = WorkspaceTab(self.notebook, advanced_mode=self.advanced_mode)
         self.notebook.add(self.workspace_tab, text="Workspace")
-        snapshot_tab = SnapshotTab(self.notebook, advanced_mode=self.advanced_mode)
+        self.snapshot_tab = SnapshotTab(self.notebook, advanced_mode=self.advanced_mode)
         self.notebook.add(self.snapshot_tab, text="Snapshot")
-        shortcut_tab = ShortcutTab(self.notebook, advanced_mode=self.advanced_mode)
+        self.shortcut_tab = ShortcutTab(self.notebook, advanced_mode=self.advanced_mode)
         self.notebook.add(self.shortcut_tab, text="Shortcuts")
-        profile_tab = ProfileTab(self.notebook, advanced_mode=self.advanced_mode)
+        self.profile_tab = ProfileTab(self.notebook, advanced_mode=self.advanced_mode)
         self.notebook.add(self.profile_tab, text="Profiles")
-        utilities_tab = UtilitiesTab(self.notebook, advanced_mode=self.advanced_mode)
+        self.utilities_tab = UtilitiesTab(self.notebook, advanced_mode=self.advanced_mode)
         self.notebook.add(self.utilities_tab, text="Utilities")
 
 if __name__ == "__main__":

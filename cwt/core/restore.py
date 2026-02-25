@@ -4,6 +4,7 @@ import json
 import traceback
 import win32gui
 import win32con
+import win32api
 from fuzzywuzzy import fuzz
 from pathlib import Path
 from pyvda import AppView, get_virtual_desktops
@@ -12,6 +13,33 @@ from cwt.utils.vda_utils import get_current_virtual_desktop_id
 
 # Future: make this a .windowignore file
 IGNORED_PROCESSES = {"VoiceAccess.exe", "explorer.exe"}
+
+
+def get_monitor_bounds():
+    """
+    Returns the union bounding box across all connected monitors as
+    (x_min, y_min, x_max, y_max) in physical pixels.
+    """
+    monitors = win32api.EnumDisplayMonitors()
+    x_min = min(r[0] for _, _, r in monitors)
+    y_min = min(r[1] for _, _, r in monitors)
+    x_max = max(r[2] for _, _, r in monitors)
+    y_max = max(r[3] for _, _, r in monitors)
+    return x_min, y_min, x_max, y_max
+
+
+def is_within_bounds(x, y, width, height, bounds):
+    """
+    Returns True if the window's top-left anchor falls within the usable
+    monitor space. A 20px margin is applied so partially off-screen windows
+    still have a grabbable title bar.
+    """
+    x_min, y_min, x_max, y_max = bounds
+    MARGIN = 20
+    return (
+        x_min - MARGIN <= x <= x_max - MARGIN and
+        y_min <= y <= y_max - MARGIN
+    )
 
 def move_and_resize(hwnd, x, y, width, height, logger=print):
     """
@@ -76,13 +104,23 @@ def resolve_desktop(snap_win, logger):
     return None
 
 def restore_window_layout(matches, threshold, logger):
+    bounds = get_monitor_bounds()
+    logger(f"[🖥️] Monitor bounds: x={bounds[0]}→{bounds[2]}, y={bounds[1]}→{bounds[3]}")
+
     for snap_win, live_win, score in matches:
         if score >= threshold and live_win:
             if snap_win.get("exe") in IGNORED_PROCESSES:
                 logger(f"[!] Skipping known system window: {snap_win['exe']}")
                 continue
+
+            x, y, w, h = snap_win["x"], snap_win["y"], snap_win["width"], snap_win["height"]
+
+            if not is_within_bounds(x, y, w, h, bounds):
+                logger(f"[⚠️] Out of bounds — skipping: '{snap_win['title']}' @ ({x}, {y}) {w}×{h}")
+                continue
+
             hwnd = live_win["hwnd"]
-            move_and_resize(hwnd, snap_win["x"], snap_win["y"], snap_win["width"], snap_win["height"], logger)
+            move_and_resize(hwnd, x, y, w, h, logger)
             target_desktop = resolve_desktop(snap_win, logger)
             if target_desktop:
                 try:

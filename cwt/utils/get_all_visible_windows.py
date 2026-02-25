@@ -3,10 +3,8 @@
 import win32gui
 import win32process
 import psutil
-import traceback
 from pyvda import AppView, get_virtual_desktops
-#from cwt.utils.vda_utils import get_virtual_desktop_id_map
-from cwt.utils.debug_logger import log_debug, log_info, log_error  # Updated for centralized logging
+from cwt.utils.debug_logger import log_debug, log_info, log_error
 
 def get_all_visible_windows():
     log_info("Starting window enumeration and desktop mapping.")
@@ -58,8 +56,7 @@ def get_all_visible_windows():
                     desktop_name = desktop_guid_to_name.get(guid, f"Desktop {guid}")
                     break
         except Exception as e:
-            log_error(f"Failed to associate desktop for: '{win_title}' ({exe}) — {e}")
-            log_debug(traceback.format_exc())
+            log_debug(f"[SKIP] '{win_title}' ({exe}) — not assignable to virtual desktop, skipping.")
 
         windows.append({
             "hwnd": hwnd,

@@ -20,9 +20,8 @@ import json
 
 class ProfileTab(ttk.Frame):
     def __init__(self, master, advanced_mode):
-        self.advanced_mode = advanced_mode
         super().__init__(master)
-        self.frame = tk.Frame(master)
+        self.advanced_mode = advanced_mode
         self.chrome_path = self._detect_chrome()
         self.profiles = self._get_profiles()
         self._build_ui()
@@ -119,18 +118,17 @@ class ProfileTab(ttk.Frame):
         print(msg)
 
     def _build_ui(self):
-        label = tk.Label(self.frame, text="Chrome Profile Launcher", font=("Arial", 14))
+        label = tk.Label(self, text="Chrome Profile Launcher", font=("Arial", 14))
         label.pack(pady=10)
 
-        self.listbox = tk.Listbox(self.frame, selectmode=tk.EXTENDED, height=12, width=35)
+        self.listbox = tk.Listbox(self, selectmode=tk.EXTENDED, height=12, width=35)
         for profile in self.profiles:
             self.listbox.insert(tk.END, profile)
         self.listbox.pack(pady=5)
 
-        launch_btn = tk.Button(self.frame, text="Launch Selected", command=self.launch_selected_profiles)
+        launch_btn = tk.Button(self, text="Launch Selected", command=self.launch_selected_profiles)
         launch_btn.pack(pady=5)
 
-        # Restore Tabs patch button
-        patch_btn = tk.Button(self.frame, text="Enable Restore Tabs", command=self.enable_restore_tabs)
+        patch_btn = tk.Button(self, text="Enable Restore Tabs", command=self.enable_restore_tabs)
         patch_btn.pack(pady=5)
 

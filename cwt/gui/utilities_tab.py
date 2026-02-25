@@ -3,86 +3,97 @@
 """
 UtilitiesTab – Chrome Workspace Toolkit (CWT)
 
-Provides system-level tools such as shell folder audit and default mapping restore.
+Provides system-level tools such as shell folder audit, default mapping restore,
+and monitor layout calibration for snapshot/restore accuracy.
 """
 
 import tkinter as tk
 from tkinter import ttk, messagebox
 import os
 import winreg
+import ctypes
+import win32api
+from cwt.utils.tooltip import ToolTip
 
-# Tooltip replacement for Tkinter (safe version)
-class ToolTip:
-    def __init__(self, widget, text):
-        self.widget = widget
-        self.text = text
-        self.tip_window = None
-        self.widget.bind("<Enter>", self.on_enter)
-        self.widget.bind("<Leave>", self.on_leave)
-
-    def on_enter(self, event=None):
-        if self.tip_window or not self.text:
-            return
-        try:
-            x = self.widget.winfo_rootx() + 20
-            y = self.widget.winfo_rooty() + self.widget.winfo_height() + 10
-            self.tip_window = tw = tk.Toplevel(self.widget)
-            tw.wm_overrideredirect(True)
-            tw.geometry(f"+{x}+{y}")
-            label = tk.Label(tw, text=self.text, justify=tk.LEFT,
-                            background="#ffffe0", relief=tk.SOLID, borderwidth=1,
-                            font=("tahoma", "8", "normal"))
-            label.pack(ipadx=5, ipady=2)
-        except:
-            pass
-
-    def on_leave(self, event=None):
-        if self.tip_window:
-            self.tip_window.destroy()
-            self.tip_window = None
 
 class UtilitiesTab(ttk.Frame):
     def __init__(self, master, advanced_mode):
-        self.advanced_mode = advanced_mode
         super().__init__(master)
-        self.frame = tk.Frame(master)
+        self.advanced_mode = advanced_mode
         self._build_ui()
 
     def _build_ui(self):
-        ttk.Label(self.frame, text="🧰 Shell Folder Audit & Remap", font=("Arial", 14)).pack(pady=(20, 10))
+        # ── Shell Folder Audit ──────────────────────────────────────────────
+        ttk.Label(self, text="🧰 Shell Folder Audit & Remap", font=("Segoe UI", 11, "bold")).pack(pady=(12, 4))
 
-        self.adv_check = ttk.Checkbutton(self.frame, text="Advanced Mode", variable=self.advanced_mode)
-        self.adv_check.pack(anchor="w", padx=10)
+        self.adv_check = ttk.Checkbutton(self, text="Advanced Mode", variable=self.advanced_mode)
+        self.adv_check.pack(anchor="w", padx=14)
 
-        self.folder_tree = ttk.Treeview(self.frame, columns=("Status", "Path"), show="headings", height=8)
+        self.folder_tree = ttk.Treeview(self, columns=("Name", "Status", "Path"), show="headings", height=7)
+        self.folder_tree.heading("Name", text="Folder")
         self.folder_tree.heading("Status", text="Status")
         self.folder_tree.heading("Path", text="Path")
-        self.folder_tree.column("Status", width=100, anchor="center")
-        self.folder_tree.column("Path", width=400)
-        self.folder_tree.pack(pady=5)
+        self.folder_tree.column("Name", width=90, anchor="w")
+        self.folder_tree.column("Status", width=90, anchor="center")
+        self.folder_tree.column("Path", width=350)
+        self.folder_tree.pack(pady=4, padx=14)
 
-        button_frame = tk.Frame(self.frame)
-        button_frame.pack(pady=5)
+        btn_row = tk.Frame(self)
+        btn_row.pack(pady=4)
 
-        refresh_btn = ttk.Button(button_frame, text="🔄 Refresh Status", command=self.refresh_shell_audit)
+        refresh_btn = ttk.Button(btn_row, text="🔄 Refresh Status", command=self.refresh_shell_audit)
         refresh_btn.pack(side=tk.LEFT, padx=5)
         ToolTip(refresh_btn, "Re-scan current user shell folder paths")
 
-        restore_btn = ttk.Button(button_frame, text="🚰 Restore Defaults", command=self.restore_shell_defaults)
+        restore_btn = ttk.Button(btn_row, text="🚰 Restore Defaults", command=self.restore_shell_defaults)
         restore_btn.pack(side=tk.LEFT, padx=5)
         ToolTip(restore_btn, "Restore system folder mappings to local user profile")
 
         self.refresh_shell_audit()
 
+        # ── Monitor Calibration ─────────────────────────────────────────────
+        ttk.Separator(self, orient="horizontal").pack(fill="x", padx=14, pady=(10, 6))
+
+        ttk.Label(self, text="🖥️ Monitor Layout & Calibration", font=("Segoe UI", 11, "bold")).pack(pady=(0, 4))
+
+        self.monitor_tree = ttk.Treeview(
+            self,
+            columns=("Monitor", "Resolution", "Position", "DPI", "Primary"),
+            show="headings",
+            height=4
+        )
+        self.monitor_tree.heading("Monitor",    text="Monitor")
+        self.monitor_tree.heading("Resolution", text="Resolution")
+        self.monitor_tree.heading("Position",   text="Top-Left")
+        self.monitor_tree.heading("DPI",        text="DPI Scale")
+        self.monitor_tree.heading("Primary",    text="Primary")
+        self.monitor_tree.column("Monitor",    width=80,  anchor="center")
+        self.monitor_tree.column("Resolution", width=110, anchor="center")
+        self.monitor_tree.column("Position",   width=100, anchor="center")
+        self.monitor_tree.column("DPI",        width=80,  anchor="center")
+        self.monitor_tree.column("Primary",    width=60,  anchor="center")
+        self.monitor_tree.pack(pady=4, padx=14)
+
+        mon_btn_row = tk.Frame(self)
+        mon_btn_row.pack(pady=4)
+
+        scan_btn = ttk.Button(mon_btn_row, text="🔍 Scan Monitors", command=self.refresh_monitor_info)
+        scan_btn.pack(side=tk.LEFT, padx=5)
+        ToolTip(scan_btn, "Detect all connected monitors and their coordinate layout")
+
+        self.refresh_monitor_info()
+
+    # ── Shell Folder Methods ────────────────────────────────────────────────
+
     def refresh_shell_audit(self):
         self.folder_tree.delete(*self.folder_tree.get_children())
 
         folders = {
-            "Desktop": "Desktop",
-            "Personal": "Documents",
-            "MyPictures": "Pictures",
-            "MyMusic": "Music",
-            "MyVideos": "Videos",
+            "Desktop":   "Desktop",
+            "Personal":  "Documents",
+            "MyPictures":"Pictures",
+            "MyMusic":   "Music",
+            "MyVideos":  "Videos",
             "{374DE290-123F-4565-9164-39C4925E467B}": "Downloads",
             "Favorites": "Favorites"
         }
@@ -94,35 +105,24 @@ class UtilitiesTab(ttk.Frame):
                 with winreg.OpenKey(winreg.HKEY_CURRENT_USER,
                     r"Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders") as key:
                     raw = winreg.QueryValueEx(key, reg_key)[0]
-
                 path = os.path.expandvars(raw)
-                if not path:
-                    status = "UNKNOWN"
-                elif onedrive and path.startswith(onedrive):
-                    status = "NOT LOCAL"
-                else:
-                    status = "LOCAL"
-            except:
-                path = ""
-                status = "UNKNOWN"
-
-            if self.advanced_mode.get():
-                print(f"[DEBUG] {display_name}: {status} → {path}")
+                status = "NOT LOCAL" if (onedrive and path.startswith(onedrive)) else "LOCAL"
+            except Exception:
+                path, status = "", "UNKNOWN"
 
             self.folder_tree.insert("", "end", values=(display_name, status, path))
 
     def restore_shell_defaults(self):
-        confirm = messagebox.askyesno("Confirm", "This will reset all special folders to local paths.\nProceed?")
-        if not confirm:
+        if not messagebox.askyesno("Confirm", "This will reset all special folders to local paths.\nProceed?"):
             return
 
         base = os.environ["USERPROFILE"]
         folders = {
-            "Desktop": "Desktop",
-            "Personal": "Documents",
-            "MyPictures": "Pictures",
-            "MyMusic": "Music",
-            "MyVideos": "Videos",
+            "Desktop":   "Desktop",
+            "Personal":  "Documents",
+            "MyPictures":"Pictures",
+            "MyMusic":   "Music",
+            "MyVideos":  "Videos",
             "{374DE290-123F-4565-9164-39C4925E467B}": "Downloads",
             "Favorites": "Favorites"
         }
@@ -142,3 +142,54 @@ class UtilitiesTab(ttk.Frame):
         messagebox.showinfo("Done", "Shell folders restored to local defaults.\nExplorer will now refresh.")
         os.system("taskkill /f /im explorer.exe && start explorer.exe")
         self.refresh_shell_audit()
+
+    # ── Monitor Methods ─────────────────────────────────────────────────────
+
+    def refresh_monitor_info(self):
+        self.monitor_tree.delete(*self.monitor_tree.get_children())
+
+        try:
+            monitors = win32api.EnumDisplayMonitors()
+        except Exception as e:
+            self.monitor_tree.insert("", "end", values=("Error", str(e), "", "", ""))
+            return
+
+        # Enable per-monitor DPI awareness for accurate readings
+        try:
+            ctypes.windll.shcore.SetProcessDpiAwareness(2)
+        except Exception:
+            pass
+
+        for idx, (hmon, _, rect) in enumerate(monitors, start=1):
+            try:
+                info    = win32api.GetMonitorInfo(hmon)
+                mon_rect = info["Monitor"]          # (left, top, right, bottom) physical pixels
+                flags   = info.get("Flags", 0)
+                is_primary = "✔" if flags & 1 else ""
+
+                left, top, right, bottom = mon_rect
+                width  = right  - left
+                height = bottom - top
+                res    = f"{width} × {height}"
+                pos    = f"{left}, {top}"
+
+                # DPI scale via shcore
+                try:
+                    dpi_x = ctypes.c_uint()
+                    dpi_y = ctypes.c_uint()
+                    ctypes.windll.shcore.GetDpiForMonitor(
+                        hmon.handle, 0, ctypes.byref(dpi_x), ctypes.byref(dpi_y)
+                    )
+                    scale = f"{round(dpi_x.value / 96 * 100)}%"
+                except Exception:
+                    scale = "N/A"
+
+                self.monitor_tree.insert("", "end", values=(
+                    f"Monitor {idx}", res, pos, scale, is_primary
+                ))
+
+                if self.advanced_mode.get():
+                    print(f"[MONITOR {idx}] {res} @ ({pos}) DPI={scale} Primary={bool(flags & 1)}")
+
+            except Exception as e:
+                self.monitor_tree.insert("", "end", values=(f"Monitor {idx}", "Error", str(e), "", ""))

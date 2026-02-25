@@ -1,3 +1,4 @@
+
 """
 Database interface for CWT + WEM.
 Handles initialization, connection, and basic access utilities.
