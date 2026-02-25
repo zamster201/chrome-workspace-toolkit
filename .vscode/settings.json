@@ -7,13 +7,16 @@
         "args": [
           "-NoExit",
           "-Command",
-          "cd ${workspaceFolder}; & 'C:/CTS/cts_common_venv/.venv128/Scripts/Activate.ps1'"
+          "cd ${workspaceFolder}; & 'C:/CTS/venvs/.venv128/Scripts/Activate.ps1'"
         ],
         "icon": "rocket",
         "color": "#11a8cd"
       }
     },
-    "terminal.integrated.defaultProfile.windows": "CWT Venv",
-    "python.defaultInterpreterPath": "C:/CTS/cts_common_venv/.venv128/Scripts/python.exe"
+    "terminal.integrated.defaultProfile.windows": "🖥️ CWT Venv",
+    "python.defaultInterpreterPath": "C:/CTS/venvs/.venv128/Scripts/python.exe",
+    "python.analysis.extraPaths": [
+      "C:/CTS/venvs/.venv128/Lib/site-packages"
+    ]
   }
 }
