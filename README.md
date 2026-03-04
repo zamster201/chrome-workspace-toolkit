@@ -1,6 +1,6 @@
-# Chrome Workspace Toolkit (CWT)
+# Context Workspace Toolkit (CWT)
 
-**CWT** is a GUI-based utility for capturing, restoring, and managing multi-desktop browser workspaces—designed for power users, researchers, and creators juggling multiple Chrome (or Chromium-based) profiles.
+**CWT** is a GUI-based utility for capturing, restoring, and managing multi-desktop windows workspaces — designed for power users, researchers, and creators juggling multiple applications, profiles, and windows.
 
 ## 🧩 Features
 
@@ -15,7 +15,7 @@
 
 1. Clone the repo:
 
-   git clone https://github.com/zamster201/chrome-workspace-toolkit.git
+   git clone https://github.com/zamster201/context-workspace-toolkit.git
    
    
 Install dependencies:
@@ -39,7 +39,7 @@ CWT/
 └── main.py             # App entry point
 
 💡 Why CWT?
-Modern workflows are multi-window, multi-profile, and multi-context. CWT captures your entire working environment—so you can reset, restore, or rapidly pivot across tasks without wasting time.
+Modern workflows are multi-window, multi-profile, and multi-context. CWT captures your entire working environment — so you can reset, restore, or rapidly pivot across tasks without wasting time.
 
 ⚙️ System Requirements
 Windows 10/11
